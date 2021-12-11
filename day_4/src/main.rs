@@ -45,7 +45,7 @@ impl Board {
         }
     }
 
-    fn set_winner(&mut self) -> bool {
+    fn set_winner(&self) -> bool {
         // for each possible winning state check the grid indexes for matches and return true if all indexes match
         let mut matches = 0;
         for winning_state in BOARD_WIN_STATES.iter() {
