@@ -90,36 +90,30 @@ fn main() {
         for board in boards.iter_mut() {
             board.mark_match(n);
         }
-        // let winner = boards.iter().find(|board| board.is_winner);
-        // if winner.is_some() {
-        //     let sum = winner.unwrap().get_sum();
-        //     println!(
-        //         "WINNER!! winning_number: {}, sum: {}, p: {}",
-        //         n,
-        //         sum,
-        //         sum * n
-        //     );
-        //     break;
-        // }
     }
 
-    let mut last_winner_index = 0;
-    let mut max_calls = 0;
-    let mut max_calls2 = 0;
-    for (index, board) in boards.iter().enumerate() {
-        if board.is_winner && board.calls_count > max_calls {
-            max_calls = board.calls_count;
-            last_winner_index = index;
-        }
+    // // last winner
+    let last_winner = boards.iter().max_by_key(|b| b.calls_count);
+    if let Some(last_winner) = last_winner {
+        println!(
+            "last_winner!! winning_number: {}, sum: {}, p: {}",
+            last_winner.winning_number,
+            last_winner.get_sum(),
+            last_winner.get_sum() * last_winner.winning_number,
+        );
     }
 
-    let last_winner = &boards[last_winner_index];
-    println!(
-        "last_winner!! winning_number: {}, sum: {}, p: {}",
-        last_winner.winning_number,
-        last_winner.get_sum(),
-        last_winner.get_sum() * last_winner.winning_number,
-    );
+    // first winner
+    let winner = boards.iter().min_by_key(|b| b.calls_count);
+    if let Some(winner) = winner {
+        let sum = winner.get_sum();
+        println!(
+            "WINNER!! winning_number: {}, sum: {}, p: {}",
+            winner.winning_number,
+            sum,
+            sum * winner.winning_number
+        );
+    }
 }
 
 fn drawn_numbers_and_boards(filename: &str) -> (Vec<i32>, Vec<Board>) {
