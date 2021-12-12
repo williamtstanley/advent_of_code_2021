@@ -49,15 +49,9 @@ impl Line {
 }
 
 fn main() {
-    let lines_raw = read_lines("input.txt");
-    let lines = lines_raw
+    let count: usize = read_lines("input.txt")
         .iter()
-        .map(|line| line_from_string(line))
-        .collect::<Vec<Line>>();
-
-    let count: usize = lines
-        .iter()
-        .flat_map(|line| line.all_points())
+        .flat_map(|line| line_from_string(line).all_points())
         .fold(HashMap::new(), |mut map, point| {
             *map.entry(point).or_insert(0) += 1;
             map
