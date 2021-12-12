@@ -25,38 +25,23 @@ fn part1(input: &str) -> i32 {
 }
 
 fn part2(input: &str) -> usize {
-    let mut buckets = Buckets::new();
+    // keep track of the number of fish in each interval position
+    let mut buckets = [0; 9];
+
+    // for each initial fish interval update the count at that index
     for number in input.split(",") {
-        buckets.insert(number.parse().unwrap());
+        let number = number.parse::<usize>().unwrap();
+        buckets[number] += 1;
     }
 
+    // for each day move each fish to the next interval
+    // for the fish that wrap they "breed" so add one for each at index 6
     for _ in 0..256 {
-        buckets.step_day();
+        buckets.rotate_left(1);
+        buckets[6] += buckets[8];
     }
 
-    buckets.count()
-}
-
-#[derive(Debug)]
-struct Buckets {
-    buckets: [usize; 9],
-}
-impl Buckets {
-    fn new() -> Self {
-        Self { buckets: [0; 9] }
-    }
-    fn insert(&mut self, index: usize) {
-        self.buckets[index] += 1;
-    }
-
-    fn step_day(&mut self) {
-        self.buckets.rotate_left(1);
-        self.buckets[6] += self.buckets[8];
-    }
-
-    fn count(&self) -> usize {
-        self.buckets.into_iter().sum()
-    }
+    buckets.into_iter().sum()
 }
 
 #[derive(Debug, Clone)]
