@@ -7,7 +7,7 @@ pub(crate) fn run() {
 }
 
 fn part1(input: &str) -> i32 {
-    // let lines = read_lines("input.txt");
+    // This implementation was a disaster when the total days count went beyond 100
     let mut school = School::new(
         input
             .split(',')
@@ -27,14 +27,14 @@ fn part1(input: &str) -> i32 {
 fn part2(input: &str) -> usize {
     let mut buckets = Buckets::new();
     for number in input.split(",") {
-        buckets.insert_fish(number.parse().unwrap());
+        buckets.insert(number.parse().unwrap());
     }
 
     for _ in 0..256 {
         buckets.step_day();
     }
 
-    buckets.count_fish()
+    buckets.count()
 }
 
 #[derive(Debug)]
@@ -45,7 +45,7 @@ impl Buckets {
     fn new() -> Self {
         Self { buckets: [0; 9] }
     }
-    fn insert_fish(&mut self, index: usize) {
+    fn insert(&mut self, index: usize) {
         self.buckets[index] += 1;
     }
 
@@ -54,7 +54,7 @@ impl Buckets {
         self.buckets[6] += self.buckets[8];
     }
 
-    fn count_fish(&self) -> usize {
+    fn count(&self) -> usize {
         self.buckets.into_iter().sum()
     }
 }
