@@ -1,7 +1,30 @@
 use std::cmp;
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+const INPUT: &'static str = include_str!("../inputs/5.txt");
+
+pub(crate) fn run() {
+    println!("Day 5");
+    // println!("Part 1: {}", part1(INPUT));
+    println!("Part 2: {}", part2(INPUT));
+}
+
+// fn part1(input: &str) -> usize {}
+
+fn part2(input: &str) -> usize {
+    let count: usize = input
+        .lines()
+        .into_iter()
+        .flat_map(|line| line_from_string(line).points)
+        .fold(HashMap::new(), |mut map, point| {
+            *map.entry(point).or_insert(0) += 1;
+            map
+        })
+        .into_iter()
+        .filter(|(_, count)| *count > 1)
+        .count();
+
+    count
+}
 
 #[derive(Hash, Eq, PartialEq, Debug, Copy, Clone)]
 struct Point {
@@ -50,27 +73,6 @@ fn all_points(start: Point, end: Point) -> Vec<Point> {
         .zip(ys.iter())
         .map(|(x, y)| Point { x: *x, y: *y })
         .collect()
-}
-
-fn main() {
-    let count: usize = read_lines("input.txt")
-        .iter()
-        .flat_map(|line| line_from_string(line).points)
-        .fold(HashMap::new(), |mut map, point| {
-            *map.entry(point).or_insert(0) += 1;
-            map
-        })
-        .into_iter()
-        .filter(|(_, count)| *count > 1)
-        .count();
-
-    println!("counts: {:?}", count);
-}
-
-fn read_lines(filename: &str) -> Vec<String> {
-    let file = File::open(filename).unwrap();
-    let reader = BufReader::new(file);
-    reader.lines().map(|l| l.unwrap()).collect()
 }
 
 fn line_from_string(line: &str) -> Line {

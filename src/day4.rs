@@ -1,15 +1,57 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+const INPUT: &'static str = include_str!("../inputs/4.txt");
+
+pub(crate) fn run() {
+    println!("Day 4");
+    println!("Part 1: {}", part1(INPUT));
+    println!("Part 2: {}", part2(INPUT));
+}
+
+fn part1(input: &str) -> usize {
+    let (drawn_numbers, mut boards) = drawn_numbers_and_boards(input);
+    for n in drawn_numbers {
+        for board in boards.iter_mut() {
+            board.mark_match(n);
+        }
+    }
+
+    let mut score: usize = 0;
+    // first winner
+    let winner = boards.iter().min_by_key(|b| b.calls_count);
+    if let Some(winner) = winner {
+        let sum = winner.get_sum();
+        score = sum * winner.winning_number
+    }
+
+    score
+}
+
+fn part2(input: &str) -> usize {
+    let (drawn_numbers, mut boards) = drawn_numbers_and_boards(input);
+    for n in drawn_numbers {
+        for board in boards.iter_mut() {
+            board.mark_match(n);
+        }
+    }
+
+    let mut score: usize = 0;
+    // // last winner
+    let last_winner = boards.iter().max_by_key(|b| b.calls_count);
+    if let Some(last_winner) = last_winner {
+        score = last_winner.get_sum() * last_winner.winning_number
+    }
+
+    score
+}
 
 #[derive(Debug, Clone, Copy)]
-struct Square(i32, bool);
+struct Square(usize, bool);
 
 #[derive(Debug, Clone)]
 struct Board {
     grid: Vec<Square>,
-    calls_count: i32,
+    calls_count: usize,
     is_winner: bool,
-    winning_number: i32,
+    winning_number: usize,
 }
 
 impl Board {
@@ -22,7 +64,7 @@ impl Board {
         }
     }
 
-    fn mark_match(&mut self, n: i32) {
+    fn mark_match(&mut self, n: usize) {
         if !self.is_winner {
             self.calls_count += 1;
             self.grid = self
@@ -63,7 +105,7 @@ impl Board {
         false
     }
 
-    fn get_sum(&self) -> i32 {
+    fn get_sum(&self) -> usize {
         self.grid
             .iter()
             .fold(0, |acc, s| if s.1 { acc } else { acc + s.0 })
@@ -83,51 +125,14 @@ const BOARD_WIN_STATES: [[usize; 5]; 10] = [
     [4, 9, 14, 19, 24],
 ];
 
-fn main() {
-    let filename = "./input.txt";
-    let (drawn_numbers, mut boards) = drawn_numbers_and_boards(filename);
-    for n in drawn_numbers {
-        for board in boards.iter_mut() {
-            board.mark_match(n);
-        }
-    }
-
-    // // last winner
-    let last_winner = boards.iter().max_by_key(|b| b.calls_count);
-    if let Some(last_winner) = last_winner {
-        println!(
-            "last_winner!! winning_number: {}, sum: {}, p: {}",
-            last_winner.winning_number,
-            last_winner.get_sum(),
-            last_winner.get_sum() * last_winner.winning_number,
-        );
-    }
-
-    // first winner
-    let winner = boards.iter().min_by_key(|b| b.calls_count);
-    if let Some(winner) = winner {
-        let sum = winner.get_sum();
-        println!(
-            "WINNER!! winning_number: {}, sum: {}, p: {}",
-            winner.winning_number,
-            sum,
-            sum * winner.winning_number
-        );
-    }
-}
-
-fn drawn_numbers_and_boards(filename: &str) -> (Vec<i32>, Vec<Board>) {
-    let file = File::open(filename).unwrap();
-    let reader = BufReader::new(file);
-
+fn drawn_numbers_and_boards(input: &str) -> (Vec<usize>, Vec<Board>) {
     let mut drawn_numbers = Vec::new();
     let mut board_lines = Vec::new();
     let mut boards = Vec::new();
-    for (index, line) in reader.lines().enumerate() {
-        let line = line.unwrap();
+    for (index, line) in input.lines().enumerate() {
         if index == 0 {
             for n in line.split(",") {
-                drawn_numbers.push(n.parse::<i32>().unwrap());
+                drawn_numbers.push(n.parse::<usize>().unwrap());
             }
         }
         if index > 0 && !line.is_empty() {
@@ -136,7 +141,7 @@ fn drawn_numbers_and_boards(filename: &str) -> (Vec<i32>, Vec<Board>) {
                 let mut grid = Vec::new();
                 for board_line in board_lines.iter() {
                     for n in board_line.split_whitespace() {
-                        grid.push(Square(n.parse::<i32>().unwrap(), false));
+                        grid.push(Square(n.parse::<usize>().unwrap(), false));
                     }
                 }
                 boards.push(Board::new(grid));
